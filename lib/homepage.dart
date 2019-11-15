@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lastfm_browser/following_widget.dart';
+import 'package:lastfm_browser/home_widget.dart';
+import 'package:lastfm_browser/library_widget.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -55,7 +58,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         // BottomNavigationBar items
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             title: Text('Home'),
@@ -76,18 +79,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Default page to load
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'This is the Home page. Stay tuned!',
-    ),
-    Text(
-      'This is the Following page. Stay tuned!',
-    ),
-    Text(
-      'This is your Library. Stay tuned!',
-    ),
+  final List<Widget> _widgetOptions = <Widget>[
+    HomeWidget(),
+    FollowingWidget(),
+    LibraryWidget(),
   ];
 
   void _onItemTapped(int index) {
