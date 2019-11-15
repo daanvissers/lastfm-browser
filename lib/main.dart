@@ -8,7 +8,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Last.fm Browser',
       theme: ThemeData(
-        primarySwatch: Colors.red[600],
+        primaryColor: Color.fromRGBO(213, 0, 0, 1),
       ),
       home: HomePage(title: 'Last.fm Browser'),
     );
