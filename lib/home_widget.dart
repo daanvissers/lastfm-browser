@@ -28,6 +28,10 @@ class HomeWidgetState extends State<HomeWidget> {
                 color: Color.fromRGBO(213, 0, 0, 1),
                 textColor: Colors.white,
                 child: Text("Log in"),
+                shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(18.0),
+                    side: BorderSide(color: Color.fromRGBO(213, 0, 0, 1))
+                ),
                 onPressed: _requestToken)
             : new Container(),
       ],
