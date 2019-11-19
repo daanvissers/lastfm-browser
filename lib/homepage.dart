@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lastfm_browser/following_widget.dart';
 import 'package:lastfm_browser/home_widget.dart';
 import 'package:lastfm_browser/library_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -30,7 +31,17 @@ class _HomePageState extends State<HomePage> {
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
+            UserAccountsDrawerHeader(
+              accountName: Text("currentuser123"),
+              accountEmail: Text("Current User"),
+              arrowColor: Colors.white,
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  "B",
+                  style: TextStyle(fontSize: 40.0),
+                ),
+              ),
               // child: Text('Drawer Header'),
               decoration: BoxDecoration(
                 color: Colors.red,
@@ -38,6 +49,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               title: Text('Trending'),
+              leading: Icon(Icons.trending_up),
               onTap: () {
                 Navigator.pop(context);
                 //Navigator.of(context).push(MaterialPageRoute(
@@ -46,6 +58,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               title: Text('Settings'),
+              leading: Icon(Icons.settings),
               onTap: () {
                 // Update the state of the app
                 // ...
@@ -53,6 +66,15 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
               },
             ),
+            Divider(),
+            ListTile(
+              title: Text('Log out'),
+              leading: Icon(Icons.exit_to_app),
+              onTap: () {
+                _logOut();
+                Navigator.pop(context);
+              },
+            )
           ],
         ),
       ),
@@ -92,5 +114,12 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _logOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+
+    print("SharedPreferences cleared.");
   }
 }

@@ -4,6 +4,7 @@ import 'dart:core';
 
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
@@ -13,11 +14,18 @@ class HomeWidget extends StatefulWidget {
 }
 
 class HomeWidgetState extends State<HomeWidget> {
-  String _text = "Please authenticate first!";
-  bool _btnVisible = true;
+  String _text;
+  bool _btnVisible;
+
+  @override
+  void initState() {
+    _btnVisible = true;
+    _text = "Please authenticate first!";
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
         child: new Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -39,28 +47,26 @@ class HomeWidgetState extends State<HomeWidget> {
   }
 
   void _requestToken() async {
-    final BASE_URL = "http://www.last.fm/api/auth/?api_key=";
+    final baseUrl = "http://www.last.fm/api/auth/?api_key=";
 
     // First load the config.json text file.
     // Then serialize the JSON manually using dart:convert to get the key
     final jsonString = await rootBundle.loadString('assets/config.json');
     Map<String, dynamic> key = jsonDecode(jsonString);
-    final API_KEY = key['API key'];
+    final apiKey = key['API key'];
 
     // This is the custom callback-URL. This makes the API redirect to
     // a custom Android Activity as found in the AndroidManifest.xml
-    final CALLBACK = "&cb=lastfmbrowser://authenticate";
+    final callback = "&cb=lastfmbrowser://authenticate";
 
     // Present the login dialog to the user
     final result = await FlutterWebAuth.authenticate(
-        url: BASE_URL + API_KEY + CALLBACK, callbackUrlScheme: "lastfmbrowser");
+        url: baseUrl + apiKey + callback, callbackUrlScheme: "lastfmbrowser");
 
     // Extract token from resulting url.
     // Authentication tokens are user and API account specific.
     // They are valid for 60 minutes from the moment they are granted.
     String token = Uri.parse(result).queryParameters['token'];
-
-    log("Token: " + token);
 
     _getSession(token);
   }
@@ -80,8 +86,8 @@ class HomeWidgetState extends State<HomeWidget> {
     var signature = md5.convert(utf8.encode(data));
 
     // Make the api call
-    final BASE_URL = "http://ws.audioscrobbler.com/2.0/?";
-    final String url = BASE_URL
+    final base_url = "http://ws.audioscrobbler.com/2.0/?";
+    final String url = base_url
         + "method=auth.getSession"
         + "&token=" + token
         + "&api_key=" + api_key
@@ -89,12 +95,35 @@ class HomeWidgetState extends State<HomeWidget> {
         + "&format=json";
     http.Response response = await http.post(url);
 
-    // Decode the api response
-    Map<String, dynamic> jsonData = json.decode(response.body);
+    _setUser(response);
 
     setState(() {
       _btnVisible = false;
-      _text = "Welcome, " + jsonData['session']['name'].toString() + "!";
+      _text = "Welcome!";
     });
+  }
+
+  Future<bool> _isAuthenticated() async {
+    final prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey('name')) {
+      print("Authenticated: " + prefs.getString('name'));
+      return true;
+    }
+    print("Not authenticated!");
+    return false;
+  }
+
+  void _setUser(http.Response response) async {
+    // Decode the api response
+    Map<String, dynamic> jsonData = json.decode(response.body);
+
+    // Save user in SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('name', jsonData['session']['name'].toString());
+    prefs.setString('key', jsonData['session']['key'].toString());
+    int subscriber = (jsonData['session']['subscriber'] == 0) ? 0 : 1;
+    prefs.setInt('subscriber', subscriber);
+
+    log("SharedPreferences user: " + prefs.getString('name'));
   }
 }
