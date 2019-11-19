@@ -4,7 +4,9 @@ import 'dart:core';
 
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lastfm_browser/models/user_model.dart';
+import 'package:lastfm_browser/service_locator.dart';
+import 'package:lastfm_browser/services/localstorage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
@@ -14,18 +16,22 @@ class HomeWidget extends StatefulWidget {
 }
 
 class HomeWidgetState extends State<HomeWidget> {
+  var storageService = locator<LocalStorageService>();
   String _text;
   bool _btnVisible;
 
   @override
   void initState() {
-    _btnVisible = true;
-    _text = "Please authenticate first!";
+    super.initState();
+
+    _btnVisible = (storageService.user == null) ? true : false;
+    _text = (storageService.user == null)
+        ? "Please authenticate first."
+        : "Welcome, " + storageService.user.name + "!";
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
         child: new Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -38,8 +44,7 @@ class HomeWidgetState extends State<HomeWidget> {
                 child: Text("Log in"),
                 shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(18.0),
-                    side: BorderSide(color: Color.fromRGBO(213, 0, 0, 1))
-                ),
+                    side: BorderSide(color: Color.fromRGBO(213, 0, 0, 1))),
                 onPressed: _requestToken)
             : new Container(),
       ],
@@ -87,43 +92,23 @@ class HomeWidgetState extends State<HomeWidget> {
 
     // Make the api call
     final base_url = "http://ws.audioscrobbler.com/2.0/?";
-    final String url = base_url
-        + "method=auth.getSession"
-        + "&token=" + token
-        + "&api_key=" + api_key
-        + "&api_sig=" + signature.toString()
-        + "&format=json";
+    final String url = base_url +
+        "method=auth.getSession" +
+        "&token=" +
+        token +
+        "&api_key=" +
+        api_key +
+        "&api_sig=" +
+        signature.toString() +
+        "&format=json";
     http.Response response = await http.post(url);
 
-    _setUser(response);
+    // Register the user in the Local Storage
+    storageService.user =
+        new User.fromJson(json.decode(response.body)['session']);
 
-    setState(() {
-      _btnVisible = false;
-      _text = "Welcome!";
-    });
-  }
-
-  Future<bool> _isAuthenticated() async {
-    final prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey('name')) {
-      print("Authenticated: " + prefs.getString('name'));
-      return true;
-    }
-    print("Not authenticated!");
-    return false;
-  }
-
-  void _setUser(http.Response response) async {
-    // Decode the api response
-    Map<String, dynamic> jsonData = json.decode(response.body);
-
-    // Save user in SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('name', jsonData['session']['name'].toString());
-    prefs.setString('key', jsonData['session']['key'].toString());
-    int subscriber = (jsonData['session']['subscriber'] == 0) ? 0 : 1;
-    prefs.setInt('subscriber', subscriber);
-
-    log("SharedPreferences user: " + prefs.getString('name'));
+    var mySavedUser = storageService.user;
+    print("User has been saved: " + mySavedUser.name);
+    
   }
 }

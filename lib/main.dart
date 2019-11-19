@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lastfm_browser/homepage.dart';
+import 'service_locator.dart';
 
-void main() => runApp(App());
+Future<void> main() async {
+  try {
+    await setupLocator();
+    runApp(App());
+  } catch(error) {
+    print('Locator setup has failed!');
+  }
+}
 
 class App extends StatelessWidget {
   @override
