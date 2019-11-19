@@ -16,9 +16,14 @@ class HomeWidgetState extends State<HomeWidget> {
   Widget build(BuildContext context) {
     return Container(
         child: new Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         new Text(_text),
-        new RaisedButton(child: Text("Log in"), onPressed: _requestToken),
+        new RaisedButton(
+            color: Color.fromRGBO(213, 0, 0, 1),
+            textColor: Colors.white,
+            child: Text("Log in"),
+            onPressed: _requestToken),
       ],
     ));
   }

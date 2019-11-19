@@ -31,13 +31,13 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Drawer Header'),
+              // child: Text('Drawer Header'),
               decoration: BoxDecoration(
                 color: Colors.red,
               ),
             ),
             ListTile(
-              title: Text('Item 1'),
+              title: Text('Trending'),
               onTap: () {
                 Navigator.pop(context);
                 //Navigator.of(context).push(MaterialPageRoute(
@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: Text('Item 2'),
+              title: Text('Settings'),
               onTap: () {
                 // Update the state of the app
                 // ...
@@ -64,12 +64,12 @@ class _HomePageState extends State<HomePage> {
             title: Text('Home'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            title: Text('Following'),
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.format_list_bulleted),
             title: Text('Library'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            title: Text('Following'),
           ),
         ],
         currentIndex: _selectedIndex,
@@ -84,8 +84,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _widgetOptions = <Widget>[
     HomeWidget(),
-    FollowingWidget(),
     LibraryWidget(),
+    FollowingWidget(),
   ];
 
   void _onItemTapped(int index) {
