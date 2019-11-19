@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:core';
 
+import 'package:crypto/crypto.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
@@ -11,6 +14,7 @@ class HomeWidget extends StatefulWidget {
 
 class HomeWidgetState extends State<HomeWidget> {
   String _text = "Please authenticate first!";
+  bool _btnVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +23,13 @@ class HomeWidgetState extends State<HomeWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         new Text(_text),
-        new RaisedButton(
-            color: Color.fromRGBO(213, 0, 0, 1),
-            textColor: Colors.white,
-            child: Text("Log in"),
-            onPressed: _requestToken),
+        _btnVisible
+            ? new RaisedButton(
+                color: Color.fromRGBO(213, 0, 0, 1),
+                textColor: Colors.white,
+                child: Text("Log in"),
+                onPressed: _requestToken)
+            : new Container(),
       ],
     ));
   }
@@ -50,10 +56,41 @@ class HomeWidgetState extends State<HomeWidget> {
     // They are valid for 60 minutes from the moment they are granted.
     String token = Uri.parse(result).queryParameters['token'];
 
-    log(token);
+    log("Token: " + token);
+
+    _getSession(token);
+  }
+
+  void _getSession(String token) async {
+    // Get the API key + Secret from assets
+    final jsonString = await rootBundle.loadString('assets/config.json');
+    Map<String, dynamic> key = jsonDecode(jsonString);
+    final api_key = key['API key'];
+    final secret = key['Shared secret'];
+
+    // Generate signature by ordering all the parameters by parameter-name
+    // alphabetically, and concatenating them into one string using
+    // a <name><value> scheme. Afterwards, encrypt by md5
+    String data =
+        "api_key" + api_key + "methodauth.getSessiontoken" + token + secret;
+    var signature = md5.convert(utf8.encode(data));
+
+    // Make the api call
+    final BASE_URL = "http://ws.audioscrobbler.com/2.0/?";
+    final String url = BASE_URL
+        + "method=auth.getSession"
+        + "&token=" + token
+        + "&api_key=" + api_key
+        + "&api_sig=" + signature.toString()
+        + "&format=json";
+    http.Response response = await http.post(url);
+
+    // Decode the api response
+    Map<String, dynamic> jsonData = json.decode(response.body);
 
     setState(() {
-      _text = "Succesfully authenticated!";
+      _btnVisible = false;
+      _text = "Welcome, " + jsonData['session']['name'].toString() + "!";
     });
   }
 }
