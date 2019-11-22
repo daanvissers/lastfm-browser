@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lastfm_browser/models/session_model.dart';
 import 'package:lastfm_browser/models/user_model.dart';
 import 'package:lastfm_browser/services/lastfmapi_service.dart';
 import 'package:lastfm_browser/services/localstorage_service.dart';
@@ -162,6 +161,6 @@ class _HomePageState extends State<HomePage> {
   void _logOut() {
     // Clear the logged in user with a blank one
     LocalStorageService localStorageService = LocalStorageService();
-    localStorageService.session = Session();
+    localStorageService.session = null;
   }
 }
