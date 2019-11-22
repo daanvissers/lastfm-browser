@@ -76,14 +76,18 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             Divider(),
-            ListTile(
-              title: Text('Log out'),
-              leading: Icon(Icons.exit_to_app),
-              onTap: () {
-                _logOut();
-                Navigator.pop(context);
-              },
-            )
+            // If authenticated user is not null, show 'Log out'-ListTile
+            // TODO: 'Log out'-ListTile doesn't immediately show when user authenticates
+            (localStorageService.user.name != null)
+                ? ListTile(
+                    title: Text('Log out'),
+                    leading: Icon(Icons.exit_to_app),
+                    onTap: () {
+                      _logOut();
+                      Navigator.pop(context);
+                    },
+                  )
+                : Container()
           ],
         ),
       ),
