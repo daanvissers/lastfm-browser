@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:lastfm_browser/models/user_model.dart';
+import 'package:lastfm_browser/models/session_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
@@ -9,7 +9,7 @@ class LocalStorageService {
   // We'll keep a static instance of the SharedPreferences
   // as well as the instance for our service.
 
-  static const String UserKey = 'user';
+  static const String SessionKey = 'session';
   static const String DarkModeKey = 'darkmode';
 
   static LocalStorageService _instance;
@@ -27,19 +27,17 @@ class LocalStorageService {
     return _instance;
   }
 
-  // User
-  User get user {
-    var userJson = _getFromDisk(UserKey);
-    if (userJson == null) {
-      print("User could not be found, user is null.");
+  // Session
+  Session get session {
+    var sessionJson = _getFromDisk(SessionKey);
+    if (sessionJson == null) {
       return null;
     }
-
-    return User.fromJson(json.decode(userJson));
+    return Session.fromJson(json.decode(sessionJson));
   }
 
-  set user(User userToSave) {
-    _saveToDisk(UserKey, json.encode(userToSave.toJson()));
+  set session(Session sessionToSave) {
+    _saveToDisk(SessionKey, json.encode(sessionToSave.toJson()));
   }
 
   // Dark Mode
@@ -48,13 +46,17 @@ class LocalStorageService {
 
   dynamic _getFromDisk(String key) {
     var value = _preferences.get(key);
-    print('(TRACE) LocalStorageService:_getFromDisk. key: $key value: $value');
+
+    // DEBUG:
+    // print('(TRACE) LocalStorageService:_getFromDisk. key: $key value: $value');
     return value;
   }
 
   // _saveToDisk function that handles all types
   void _saveToDisk<T>(String key, T content) {
-    print('(TRACE) LocalStorageService:_saveToDisk. key: $key value: $content');
+
+    // DEBUG:
+    // print('(TRACE) LocalStorageService:_saveToDisk. key: $key value: $content');
 
     if (content is String) {
       _preferences.setString(key, content);

@@ -3,7 +3,7 @@ import 'dart:core';
 
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
-import 'package:lastfm_browser/models/user_model.dart';
+import 'package:lastfm_browser/models/session_model.dart';
 import 'package:lastfm_browser/service_locator.dart';
 import 'package:lastfm_browser/services/localstorage_service.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +24,10 @@ class HomeWidgetState extends State<HomeWidget> {
     super.initState();
 
     // Initialize the State depending on authenticated user
-    _btnVisible = (storageService.user.name == null) ? true : false;
-    _text = (storageService.user.name == null)
+    _btnVisible = (storageService.session == null) ? true : false;
+    _text = (storageService.session == null)
         ? "Please authenticate first."
-        : "Welcome, " + storageService.user.name + "!";
+        : "Welcome, " + storageService.session.name + "!";
   }
 
   @override
@@ -104,15 +104,15 @@ class HomeWidgetState extends State<HomeWidget> {
     http.Response response = await http.post(url);
 
     // Register the user in the Local Storage
-    storageService.user =
-        new User.fromJson(json.decode(response.body)['session']);
+    storageService.session =
+        new Session.fromJson(json.decode(response.body)['session']);
 
     // Change the widget
     _btnVisible = false;
-    _text = "Welcome, " + storageService.user.name + "!";
+    _text = "Welcome, " + storageService.session.name + "!";
 
     // Debug saved user
-    var mySavedUser = storageService.user;
+    var mySavedUser = storageService.session;
     print("User has been saved: " + mySavedUser.name);
   }
 }

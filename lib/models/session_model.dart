@@ -1,11 +1,11 @@
-class User {
+class Session {
   final String name;
   final String key;
   final int subscriber;
 
-  User({this.name, this.key, this.subscriber});
+  Session({this.name, this.key, this.subscriber});
 
-  User.fromJson(Map<String, dynamic> json)
+  Session.fromJson(Map<String, dynamic> json)
       : name = json['name'],
         key = json['key'],
         subscriber = json['subscriber'];

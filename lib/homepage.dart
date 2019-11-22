@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lastfm_browser/following_widget.dart';
 import 'package:lastfm_browser/home_widget.dart';
 import 'package:lastfm_browser/library_widget.dart';
-import 'package:lastfm_browser/models/user_model.dart';
+import 'package:lastfm_browser/models/session_model.dart';
 import 'package:lastfm_browser/services/localstorage_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,14 +35,14 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: (localStorageService.user.name == null)
+              accountName: (localStorageService.session == null)
                   ? Text('')
-                  : Text(localStorageService.user.name),
-              accountEmail: (localStorageService.user.name == null)
+                  : Text(localStorageService.session.name),
+              accountEmail: (localStorageService.session == null)
                   ? Text('')
                   : Text("Local User"),
               arrowColor: Colors.white,
-              currentAccountPicture: (localStorageService.user.name == null)
+              currentAccountPicture: (localStorageService.session == null)
                   ? Text('')
                   : CircleAvatar(
                       backgroundColor: Colors.white,
@@ -76,9 +76,9 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             Divider(),
-            // If authenticated user is not null, show 'Log out'-ListTile
+            // If session is not null, show 'Log out'-ListTile
             // TODO: 'Log out'-ListTile doesn't immediately show when user authenticates
-            (localStorageService.user.name != null)
+            (localStorageService.session != null)
                 ? ListTile(
                     title: Text('Log out'),
                     leading: Icon(Icons.exit_to_app),
@@ -132,6 +132,6 @@ class _HomePageState extends State<HomePage> {
   void _logOut() {
     // Clear the logged in user with a blank one
     LocalStorageService localStorageService = LocalStorageService();
-    localStorageService.user = User();
+    localStorageService.session = Session();
   }
 }
