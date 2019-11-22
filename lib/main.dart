@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lastfm_browser/homepage.dart';
+import 'package:lastfm_browser/screens/index/index.dart';
 import 'service_locator.dart';
 
 Future<void> main() async {

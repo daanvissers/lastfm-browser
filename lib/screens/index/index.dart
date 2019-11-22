@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:lastfm_browser/following_widget.dart';
-import 'package:lastfm_browser/home_widget.dart';
-import 'package:lastfm_browser/library_widget.dart';
 import 'package:lastfm_browser/models/session_model.dart';
 import 'package:lastfm_browser/services/localstorage_service.dart';
+import 'package:lastfm_browser/screens/index/components/following_widget.dart';
+import 'package:lastfm_browser/screens/index/components/home_widget.dart';
+import 'package:lastfm_browser/screens/index/components/library_widget.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
