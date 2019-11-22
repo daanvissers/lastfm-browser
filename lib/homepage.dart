@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lastfm_browser/following_widget.dart';
 import 'package:lastfm_browser/home_widget.dart';
 import 'package:lastfm_browser/library_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lastfm_browser/models/user_model.dart';
+import 'package:lastfm_browser/services/localstorage_service.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -14,6 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  LocalStorageService localStorageService = LocalStorageService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,16 +35,22 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("currentuser123"),
-              accountEmail: Text("Current User"),
+              accountName: (localStorageService.user.name == null)
+                  ? Text('')
+                  : Text(localStorageService.user.name),
+              accountEmail: (localStorageService.user.name == null)
+                  ? Text('')
+                  : Text("Local User"),
               arrowColor: Colors.white,
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(
-                  "B",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
+              currentAccountPicture: (localStorageService.user.name == null)
+                  ? Text('')
+                  : CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        "B",
+                        style: TextStyle(fontSize: 40.0, color: Colors.black54),
+                      ),
+                    ),
               // child: Text('Drawer Header'),
               decoration: BoxDecoration(
                 color: Colors.red,
@@ -52,8 +61,8 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.trending_up),
               onTap: () {
                 Navigator.pop(context);
-                //Navigator.of(context).push(MaterialPageRoute(
-                //    builder: (BuildContext context) => SecondRoute()));
+                // Navigator.of(context).push(MaterialPageRoute(
+                //     builder: (BuildContext context) => SecondRoute()));
               },
             ),
             ListTile(
@@ -116,10 +125,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _logOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.clear();
-
-    print("SharedPreferences cleared.");
+  void _logOut() {
+    // Clear the logged in user with a blank one
+    LocalStorageService localStorageService = LocalStorageService();
+    localStorageService.user = User();
   }
 }

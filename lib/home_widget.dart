@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:core';
 
 import 'package:crypto/crypto.dart';
@@ -24,8 +23,9 @@ class HomeWidgetState extends State<HomeWidget> {
   void initState() {
     super.initState();
 
-    _btnVisible = (storageService.user == null) ? true : false;
-    _text = (storageService.user == null)
+    // Initialize the State depending on authenticated user
+    _btnVisible = (storageService.user.name == null) ? true : false;
+    _text = (storageService.user.name == null)
         ? "Please authenticate first."
         : "Welcome, " + storageService.user.name + "!";
   }
@@ -80,24 +80,24 @@ class HomeWidgetState extends State<HomeWidget> {
     // Get the API key + Secret from assets
     final jsonString = await rootBundle.loadString('assets/config.json');
     Map<String, dynamic> key = jsonDecode(jsonString);
-    final api_key = key['API key'];
+    final apiKey = key['API key'];
     final secret = key['Shared secret'];
 
     // Generate signature by ordering all the parameters by parameter-name
     // alphabetically, and concatenating them into one string using
     // a <name><value> scheme. Afterwards, encrypt by md5
     String data =
-        "api_key" + api_key + "methodauth.getSessiontoken" + token + secret;
+        "api_key" + apiKey + "methodauth.getSessiontoken" + token + secret;
     var signature = md5.convert(utf8.encode(data));
 
     // Make the api call
-    final base_url = "http://ws.audioscrobbler.com/2.0/?";
-    final String url = base_url +
+    final baseUrl = "http://ws.audioscrobbler.com/2.0/?";
+    final String url = baseUrl +
         "method=auth.getSession" +
         "&token=" +
         token +
         "&api_key=" +
-        api_key +
+        apiKey +
         "&api_sig=" +
         signature.toString() +
         "&format=json";
@@ -107,8 +107,12 @@ class HomeWidgetState extends State<HomeWidget> {
     storageService.user =
         new User.fromJson(json.decode(response.body)['session']);
 
+    // Change the widget
+    _btnVisible = false;
+    _text = "Welcome, " + storageService.user.name + "!";
+
+    // Debug saved user
     var mySavedUser = storageService.user;
     print("User has been saved: " + mySavedUser.name);
-    
   }
 }
