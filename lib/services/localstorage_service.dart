@@ -40,6 +40,11 @@ class LocalStorageService {
     _saveToDisk(SessionKey, json.encode(sessionToSave.toJson()));
   }
 
+  // Clear session
+  void clearSession() {
+    _preferences.clear();
+  }
+
   // Dark Mode
   bool get darkMode => _getFromDisk(DarkModeKey) ?? false;
   set darkMode(bool value) => _saveToDisk(DarkModeKey, value);

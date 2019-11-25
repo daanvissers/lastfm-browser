@@ -4,13 +4,13 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:lastfm_browser/models/recenttrack_model.dart';
 import 'package:lastfm_browser/models/session_model.dart';
+import 'package:lastfm_browser/models/track_model.dart';
 import 'package:lastfm_browser/models/user_model.dart';
 import 'package:lastfm_browser/services/localstorage_service.dart';
 
 class LastfmApiService {
-
-
   static const String baseUrl = "http://ws.audioscrobbler.com/2.0/";
   static const String formatJson = "format=json";
   static const String methodUser = "method=user.getInfo";
@@ -18,7 +18,6 @@ class LastfmApiService {
   ///
   /// User
   ///
-
   static Future<User> getUser(String username) async {
     String apiKey = await getApiKey();
     final response = await http.get(
@@ -30,9 +29,34 @@ class LastfmApiService {
   }
 
   ///
+  /// Get User Recent Tracks
+  ///
+  static Future<List<RecentTrack>> getRecentTracks(String username) async {
+    String apiKey = await getApiKey();
+    final response = await http.get(
+        '$baseUrl/?method=user.getrecenttracks&user=$username&api_key=$apiKey&limit=20&$formatJson');
+
+    // Create new list of RecentTracks
+    List<RecentTrack> recentTracks = List<RecentTrack>();
+
+    // Json-response in a List
+    List<dynamic> jsonTracks = json.decode(response.body)['recenttracks']['track'];
+
+    // Encode each track in jsonTracks back, and use it to
+    // create a RecentTrack model.
+    for (var track in jsonTracks) {
+      track = jsonEncode(track);
+      RecentTrack recentTrack = recentTrackFromJson(track);
+      recentTracks.add(recentTrack);
+    }
+
+    print(recentTracks.length);
+    return recentTracks;
+  }
+
+  ///
   /// Auth
   ///
-
   static getToken() async {
     final baseUrl = "http://www.last.fm/api/auth/?api_key=";
 

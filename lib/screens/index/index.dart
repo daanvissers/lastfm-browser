@@ -21,12 +21,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
       drawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
         // through the options in the drawer if there isn't enough vertical
@@ -47,9 +41,9 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, snapshot) {
                       // If the LastfmApiService is done loading
                       if (snapshot.connectionState == ConnectionState.done) {
-                        print("ConnectionState is done. Loading DrawerHeader...");
+                        print(
+                            "ConnectionState is done. Loading DrawerHeader...");
                         return UserAccountsDrawerHeader(
-
                           accountName: (localStorageService.session == null)
                               ? Text('Username')
                               : Text(localStorageService.session.name),
@@ -120,25 +114,47 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        // BottomNavigationBar items
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.format_list_bulleted),
-            title: Text('Library'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            title: Text('Following'),
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color.fromRGBO(213, 0, 0, 1),
-        onTap: _onItemTapped,
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: Container(
+        decoration: new BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 15.0, // has the effect of softening the shadow
+              spreadRadius: 5.0, // has the effect of extending the shadow
+              offset: Offset(
+                10.0, // horizontal, move right 10
+                10.0, // vertical, move down 10
+              ),
+            )
+          ],
+        ),
+        child: BottomNavigationBar(
+          // BottomNavigationBar items
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              title: Text('Home'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.format_list_bulleted),
+              title: Text('Library'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              title: Text('Following'),
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Color.fromRGBO(213, 0, 0, 1),
+          elevation: 8.0,
+          onTap: _onItemTapped,
+        ),
+      ),
+      appBar: AppBar(
+        title: Text(widget.title),
       ),
     );
   }
@@ -161,6 +177,6 @@ class _HomePageState extends State<HomePage> {
   void _logOut() {
     // Clear the logged in user with a blank one
     LocalStorageService localStorageService = LocalStorageService();
-    localStorageService.session = null;
+    localStorageService.clearSession();
   }
 }
