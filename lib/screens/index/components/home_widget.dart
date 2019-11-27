@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:lastfm_browser/models/recenttrack_model.dart';
+import 'package:flutter/src/widgets/image.dart' as Img;
 import 'package:lastfm_browser/service_locator.dart';
 import 'package:lastfm_browser/services/lastfmapi_service.dart';
 import 'package:lastfm_browser/services/localstorage_service.dart';
@@ -76,6 +77,10 @@ class HomeWidgetState extends State<HomeWidget> {
 
   Widget _buildRow(RecentTrack track) {
     return ListTile(
+      contentPadding: const EdgeInsets.all(0.9),
+      leading: Img.Image(
+        image: NetworkImage(track.image[0].text),
+      ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
